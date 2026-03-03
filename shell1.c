@@ -20,28 +20,48 @@ int main(void)
         buf[strcspn(buf, "\n")] = '\0';
 
         /* A2 special case */
-        if (strncmp(buf, "./countnames", 11) == 0) {
+        char *args[128];
+        int argc = 0;
 
-            char *args[128];
-            int argc = 0;
-
-            char *tok = strtok(buf, " ");
-            while (tok != NULL) {
-                args[argc++] = tok;
-                tok = strtok(NULL, " ");
+        char *tok = strtok(buf, " \t");
+        while (tok != NULL) {
+            args[argc++] = tok;
+            tok = strtok(NULL, " \t");
+            }
+            if (argc > 0 && strcmp(args[0], "./countnames") == 0) {
+            /* if user typed only ./countnames */
+            if (argc == 1) {
+                pid = fork();
+                if (pid < 0) {
+                    perror("fork");
+                    } 
+                else if (pid == 0) {
+                    execlp("./countnames", "./countnames", (char *)0);
+                    perror("exec");
+                    _exit(127);
+                } else {
+                    waitpid(pid, &status, 0);
+                }
+            printf("%% ");
+            continue;
             }
 
             for (int i = 1; i < argc; i++) {
                 pid = fork();
+                if (pid < 0) {
+                    perror("fork");
+                    continue;
+                }
                 if (pid == 0) {
                     execlp("./countnames", "./countnames", args[i], (char *)0);
                     perror("exec");
                     _exit(127);
-                }
+                    }
             }
 
-            while (wait(&status) > 0)
-                ;
+            for (int i = 1; i < argc; i++) {
+                wait(&status);
+                }
 
             printf("%% ");
             continue;
