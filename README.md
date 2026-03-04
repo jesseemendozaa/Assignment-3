@@ -2,7 +2,9 @@
 /**
  * Description: This program implements a UNIX shell (shell1.c). Useer can call ./countnames which will spawn a child per input file. Each child will redirect output to a err and out file with its corresponding PID. err file displays any warnings such as missing line. out will contain how many times a name occured in the text file. 
  * 
- * Author names: Jada-Lien Nguyen and Jesse Mendoza 
+ * Author names: 
+ * Jada-Lien Nguyen -
+ * Jesse Mendoza -
  * Author emails: 
  * jada-lien.nguyen@sjsu.edu 
  * jesse.mendoza@sjsu.edu 
@@ -531,7 +533,7 @@ MENDOZA JESSE: 1
 
 ## Lessons Learned
 
-Jada Lien Nguyen -
+Jada Lien Nguyen - This assignment helped me understand how a UNIX shell executes programs using fork(), execvp(), and wait(). I learned how to create child processes for countnames.c and how to redirect output into PID.out and PID.err files. I also improved my debugging skills by testing different edge cases (empty lines, duplicate names, long inputs, and whitespace). Overall, documenting functions and writing a complete README made me more comfortable with writing clean, readable C code that other people can run and verify.
 
 
 Jesse Mendoza - This assignment helped me learn fork(), execvp(), wait() by creating child processes for countnames.c. I also learned how to redirect child output into a PID.out and PID.err file. Err file shows what lines were empty while Out file will display the correct intended output of how many lines in each program. Adding quit, exit, and other basic commands to shell1.c helped me to understand how a shell handles commands.
