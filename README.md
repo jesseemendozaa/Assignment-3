@@ -1,6 +1,7 @@
 
 /**
  * Description: This program implements a UNIX shell (shell1.c). Useer can call ./countnames which will spawn a child per input file. Each child will redirect output to a err and out file with its corresponding PID. err file displays any warnings such as missing line. out will contain how many times a name occured in the text file. 
+ * GitHub : https://github.com/jesseemendozaa/Assignment-2?tab=readme-ov-file
  * 
  * Author names: 
  * Jada-Lien Nguyen -
