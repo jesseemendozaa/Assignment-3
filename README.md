@@ -13,9 +13,9 @@
  * Creation date: 3/23/2026
  **/
 
- ## Link to Output of PDF:
+## Link to Output of PDF:
 
-[Jada put link here please]
+[output.pdf](output.pdf)
 
 ## How to Compile Code:
 
@@ -1036,7 +1036,7 @@ MENDOZA JESSE: 1
 
 ## Lessons Learned
 
-Jada Lien Nguyen - 
+Jada Lien Nguyen - This assignment helped me understand how to organize communication between parent and child processes. I learned how pipes can be used to return structured data, why file descriptor management matters when using dup2() and close(), and how small edge cases like empty lines or repeated names can affect the final merged result.
 
 
 Jesse Mendoza - This assignment helped me learn fork(), execvp(), wait(), pipe(), and dup2(). I learned how the child processes can send data back to the parent through pipes, how the parent can merge the results from children, and how .err and .out files are created.

@@ -30,7 +30,26 @@ typedef struct
     int count;
 } NameCountData;
 
+typedef enum
+{
+    TYPE_NAMECOUNT = 1,
+    TYPE_B
+} MessageType;
 
+typedef struct
+{
+    MessageType type;
+    size_t size;
+} MessageHeader;
+
+typedef struct
+{
+    MessageHeader header;
+    NameCountData data;
+} NameCountMessage;
+
+
+// Redirect stdout/stderr so each child leaves behind its own .out and .err logs.
 static void redirect(void)
 {
     char out[64];
@@ -131,15 +150,18 @@ int main(int argc, char *argv[])
     //This will print the final results of names and their counts
     for (int i = 0; i < lengthCount; i++)
     {
-        NameCountData data;
-        strncpy(data.name, names[i], MAX_NAME_LENGTH - 1);
-        data.name[MAX_NAME_LENGTH - 1] = '\0';
-        data.count = counts[i];
+        NameCountMessage message;
+        message.header.type = TYPE_NAMECOUNT;
+        message.header.size = sizeof(NameCountData);
+        strncpy(message.data.name, names[i], MAX_NAME_LENGTH - 1);
+        message.data.name[MAX_NAME_LENGTH - 1] = '\0';
+        message.data.count = counts[i];
 
-        write(3, &data, sizeof(NameCountData));
+        // Send header and payload together so one child's message cannot be split apart.
+        write(3, &message, sizeof(NameCountMessage));
         printf("%s: %d\n", names[i], counts[i]);
     }
 
-    close(3); // 
+    close(3); // Close the pipe endpoint inherited from shell1.
     return 0;
 }

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
 
 // The shell should support the following features:
 #define MAXLINE 1024
@@ -18,6 +19,25 @@ typedef struct
     int count;
 } NameCountData;
 
+typedef enum
+{
+    TYPE_NAMECOUNT = 1,
+    TYPE_B
+} MessageType;
+
+typedef struct
+{
+    MessageType type;
+    size_t size;
+} MessageHeader;
+
+typedef struct
+{
+    MessageHeader header;
+    NameCountData data;
+} NameCountMessage;
+
+// Merge one child result into the parent's combined name/count tables.
 static void merge_name_count(char names[MAX_NAMES][MAX_NAME_LENGTH], int counts[MAX_NAMES], int *lengthCount, const NameCountData *data)
 {
     int found = 0;
@@ -108,6 +128,7 @@ int main(void)
             pid_t children[128];
             int num_children = 0;
 
+            // Initialize the parent's aggregate table before reading from the pipe.
             for (int i = 0; i < MAX_NAMES; i++)
             {
                 finalNames[i][0] = '\0';
@@ -126,6 +147,7 @@ int main(void)
                 {
                     close(fd[0]);
 
+                    // Reserve fd 3 as the data channel back to the shell parent.
                     if (fd[1] != 3) 
                     {
                         if (dup2(fd[1], 3) == -1) 
@@ -148,14 +170,17 @@ int main(void)
 
             close(fd[1]);
 
-            NameCountData data;
+            NameCountMessage message;
             ssize_t BR;
 
-            while((BR = read(fd[0], &data, sizeof(NameCountData))) > 0) 
+            // Read one full message at a time so each header stays paired with its payload.
+            while((BR = read(fd[0], &message, sizeof(NameCountMessage))) > 0) 
             {
-                if(BR == (ssize_t)sizeof(NameCountData))
+                if(BR == (ssize_t)sizeof(NameCountMessage) &&
+                   message.header.type == TYPE_NAMECOUNT &&
+                   message.header.size == sizeof(NameCountData))
                 {
-                    merge_name_count(finalNames, finalCounts, &finalLengthCount, &data);
+                    merge_name_count(finalNames, finalCounts, &finalLengthCount, &message.data);
                 }
             }
 
@@ -166,6 +191,7 @@ int main(void)
                 waitpid(children[i], &status, 0);
             }
 
+            // Print the merged counts after every child has finished writing.
             for (int i = 0; i < finalLengthCount; i++)
             {
                 printf("%s: %d\n", finalNames[i], finalCounts[i]);

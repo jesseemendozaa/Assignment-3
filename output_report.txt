@@ -1,0 +1,39 @@
+Assignment 3 Output Summary
+
+Repository:
+https://github.com/jesseemendozaa/Assignment-3
+
+Build commands:
+gcc -Wall -Wextra -g -o countnames countnames.c
+gcc -Wall -Wextra -g -o shell1 shell1.c
+
+Representative shell1 run:
+Command entered in shell1:
+./countnames test/names.txt test/names1.txt
+
+Merged parent output:
+Tom Wu: 3
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
+
+Representative direct countnames run:
+Command:
+./countnames test/testCase1.txt
+
+Generated PID.out contents:
+Mike Lam: 1
+Jimmy Le: 1
+J i m m y L e: 1
+M ike Lam: 1
+JeSsE: 1
+JESSE: 1
+
+Generated PID.err contents:
+Warning - file test/testCase1.txt line 4 is empty.
+Warning - file test/testCase1.txt line 6 is empty.
+
+Notes:
+- countnames redirects stdout and stderr into PID-named files.
+- shell1 collects NameCountData records from children through a pipe and merges duplicate names in the parent.
