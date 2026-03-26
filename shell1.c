@@ -125,8 +125,6 @@ int main(void)
             char finalNames[MAX_NAMES][MAX_NAME_LENGTH];
             int finalCounts[MAX_NAMES];
             int finalLengthCount = 0;
-            pid_t children[128];
-            int num_children = 0;
 
             // Initialize the parent's aggregate table before reading from the pipe.
             for (int i = 0; i < MAX_NAMES; i++)
@@ -162,12 +160,7 @@ int main(void)
                     perror("exec");
                     _exit(127);
                     }
-                    else
-                    {
-                        children[num_children++] = pid;
-                    }
             }
-
             close(fd[1]);
 
             NameCountMessage message;
@@ -186,10 +179,7 @@ int main(void)
 
             close(fd[0]);
 
-            for (int i = 0; i < num_children; i++) 
-            {
-                waitpid(children[i], &status, 0);
-            }
+            while ((pid = wait(&status)) > 0);
 
             // Print the merged counts after every child has finished writing.
             for (int i = 0; i < finalLengthCount; i++)
