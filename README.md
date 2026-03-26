@@ -15,7 +15,7 @@
 
 ## Link to Output of PDF:
 
-[output.pdf](output.pdf)
+https://docs.google.com/document/d/1V2R9ABmiL5MFbTEekWxkq2pl-xA7wpfcylo4FO3aLk4/edit?usp=sharing
 
 ## How to Compile Code:
 
