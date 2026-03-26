@@ -3,26 +3,102 @@ Assignment 3 Output Summary
 Repository:
 https://github.com/jesseemendozaa/Assignment-3
 
-Build commands:
+Purpose:
+This report documents representative test cases for countnames.c and shell1.c after the pipe protocol update. The update added a typed message header to the parent-child communication path while preserving the expected visible output.
+
+Build Verification:
 gcc -Wall -Wextra -g -o countnames countnames.c
 gcc -Wall -Wextra -g -o shell1 shell1.c
 
-Representative shell1 run:
-Command entered in shell1:
-./countnames test/names.txt test/names1.txt
+Result:
+Both programs compiled successfully with no warnings.
 
-Merged parent output:
-Tom Wu: 3
+Test Case 1: Direct countnames run on names.txt
+Command:
+./countnames test/names.txt
+
+Expected behavior:
+- Create one PID.out file with the names and counts found in the file.
+- Create one PID.err file with warnings for empty lines.
+
+Observed PID.out contents:
 Nicky: 1
 Dave Joe: 2
 Yuan Cheng Chang: 3
 John Smith: 1
 
-Representative direct countnames run:
-Command:
-./countnames test/testCase1.txt
+Observed PID.err contents:
+Warning - file test/names.txt line 2 is empty.
+Warning - file test/names.txt line 5 is empty.
 
-Generated PID.out contents:
+Notes:
+- This confirms direct file parsing still works.
+- Empty lines are skipped and reported in the .err file.
+
+Test Case 2: Direct countnames run on testCase2.txt
+Command:
+./countnames test/testCase2.txt
+
+Expected behavior:
+- Preserve case sensitivity.
+- Preserve leading spaces when present in the input.
+- Warn about empty lines.
+
+Observed PID.out contents:
+Jose Mendez: 1
+Ana Nguyen: 2
+Charlie Kirk: 1
+Barrack Obama: 1
+Tommy Obama: 1
+ : 1
+ Tim Tran: 1
+Andrew White: 2
+ANDREW WHITE: 1
+Nguyen Ana: 1
+
+Observed PID.err contents:
+Warning - file test/testCase2.txt line 2 is empty.
+Warning - file test/testCase2.txt line 6 is empty.
+Warning - file test/testCase2.txt line 10 is empty.
+Warning - file test/testCase2.txt line 14 is empty.
+
+Notes:
+- Ana Nguyen and ANDREW WHITE are counted according to exact text matches.
+- The line containing only a space is preserved as " : 1".
+- The leading space in " Tim Tran" is preserved.
+
+Test Case 3: shell1 merged run on names.txt and names1.txt
+Command entered in shell1:
+./countnames test/names.txt test/names1.txt
+
+Observed merged parent output:
+Nicky: 1
+Dave Joe: 2
+Yuan Cheng Chang: 3
+John Smith: 1
+Tom Wu: 3
+
+Notes:
+- shell1 spawned one child per input file.
+- The parent received typed messages from both children and merged duplicate names.
+- Tom Wu appears in both files, so the parent combined the counts.
+
+Test Case 4: shell1 merged run on testCase1.txt and testCase3.txt
+Command entered in shell1:
+./countnames test/testCase1.txt test/testCase3.txt
+
+Observed merged parent output:
+ABRAHAM LINCOLN: 1
+ABRAHAM RAMIREZ: 1
+ ABRAHAM LINCOLN: 1
+ADRIAN ADRIAN: 1
+ADRIAN: 1
+JADA NGUYEn: 1
+GEORGE WASHINGTON: 2
+JADA NGUYEN: 1
+JORGE PEREZ: 1
+JESSE MENDOZA: 1
+MENDOZA JESSE: 1
 Mike Lam: 1
 Jimmy Le: 1
 J i m m y L e: 1
@@ -30,10 +106,15 @@ M ike Lam: 1
 JeSsE: 1
 JESSE: 1
 
-Generated PID.err contents:
-Warning - file test/testCase1.txt line 4 is empty.
-Warning - file test/testCase1.txt line 6 is empty.
-
 Notes:
-- countnames redirects stdout and stderr into PID-named files.
-- shell1 collects NameCountData records from children through a pipe and merges duplicate names in the parent.
+- The merged output includes all names from both files.
+- Distinct spellings and distinct spacing remain separate entries.
+- This confirms that the message header update did not change visible merged results.
+
+Pipe Protocol Verification:
+- The code now sends a MessageHeader plus NameCountData together as one fixed-size packet.
+- This avoids mismatching a header from one child with payload data from another child.
+- shell1 checks the message type and payload size before merging counts.
+
+Conclusion:
+The updated implementation still compiles and produces the expected direct and merged outputs. The message-header enhancement only changes the internal communication format and does not change the intended visible behavior of the assignment.
